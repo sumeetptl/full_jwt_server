@@ -35,12 +35,13 @@ class UserLoginView(APIView):
             try:
                 user=User.objects.get(email=email,password=password)
                 token=get_tokens_for_user(user) 
+                return Response({"token":token,"msg":"User Found"},status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({"msg":"User Doesn't Exist"},status=status.HTTP_200_OK)
-            else:
+        else:
                 #serializer use nahi kar rahe isliye custom handle karna pad raha hai..warna as above handle ho jata
-                return Response({'errors':{'non_field_errors':["Email or password is not valid"]}},status.HTTP_404_NOT_FOUND)
-        return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+            return Response({'errors':{'non_field_errors':["Email or password is not valid"]}},status.HTTP_404_NOT_FOUND)
+        # return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
     
 class UserProfileView(APIView):
     renderer_classes=[UserRenderer]

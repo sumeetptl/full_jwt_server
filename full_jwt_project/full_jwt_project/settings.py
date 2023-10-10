@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'jwt_app',
     'rest_framework',
     "corsheaders",
+    # "rest_framework_swagger",
 ]
 
 MIDDLEWARE = [
