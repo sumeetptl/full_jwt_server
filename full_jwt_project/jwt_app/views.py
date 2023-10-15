@@ -6,6 +6,7 @@ from jwt_app.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from jwt_app.renderers import UserRenderer
+# from .utils import verification_email
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -17,25 +18,29 @@ def get_tokens_for_user(user):
 
 class UserRegisterationView(APIView):
     renderer_classes=[UserRenderer]
+    serializer_class=UserRegistrationSerializer
     def post(self,request,format=None):
         serializer=UserRegistrationSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.create(request.data)
             token = get_tokens_for_user(user=user)
+            verification_email(user.email,user.name)
             return Response({"token":token,"msg":"User Registered Succesfully"},status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginView(APIView):
     renderer_classes=[UserRenderer]
+    serializer_class=UserLoginSerializer
     def post(self,request,format=None):
         serializer=UserLoginSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             email=serializer.data.get('email')
             password=serializer.data.get('password')
             try:
-                user=User.objects.get(email=email,password=password)
-                token=get_tokens_for_user(user) 
-                return Response({"token":token,"msg":"User Found"},status=status.HTTP_200_OK)
+                user=User.objects.get(email=email)
+                if password != user.password:
+                    token=get_tokens_for_user(user) 
+                    return Response({"token":token,"msg":"User Found"},status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({"msg":"User Doesn't Exist"},status=status.HTTP_200_OK)
         else:
@@ -46,6 +51,8 @@ class UserLoginView(APIView):
 class UserProfileView(APIView):
     renderer_classes=[UserRenderer]
     permission_classes=[IsAuthenticated]
+    serializer_class=UserLoginSerializer
+    
     def get(self,request,format=None):
         print("Request",request.user)
         serializer= UserProfileSerializer(request.user)
@@ -54,6 +61,8 @@ class UserProfileView(APIView):
 class UserChangePassword(APIView):
     renderer_classes=[UserRenderer]
     permission_classes=[IsAuthenticated]
+    serializer_class=ChangePasswordSerializer
+    
     def post(self,request,format=None):
         serializer = ChangePasswordSerializer(data=request.data,context={'user':request.user})
         if serializer.is_valid(raise_exception=True):
@@ -62,6 +71,8 @@ class UserChangePassword(APIView):
     
 class SendPasswordResetEmailView(APIView):
     renderer_classes=[UserRenderer]
+    serializer_class=SendPasswordResetEmailSerializer
+    
     def post(self,request,format=None):
         serializer= SendPasswordResetEmailSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -70,6 +81,7 @@ class SendPasswordResetEmailView(APIView):
     
 class ResetPasswordView(APIView):
     renderer_classes=[UserRenderer]
+    serializer_class= ResetPasswordSerializer
     def post(self, request, uid, token, format=None):
         serializer = ResetPasswordSerializer(data=request.data,context={'uid' : uid, 'token': token})
         if serializer.is_valid(raise_exception=True):

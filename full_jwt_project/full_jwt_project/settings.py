@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'jwt_app',
     'rest_framework',
     "corsheaders",
+    "drf_spectacular",
     # "rest_framework_swagger",
 ]
 
@@ -113,7 +114,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-SECRET_KEY = "xyz"
+# SECRET_KEY = "xyz"
 
 
 # Static files (CSS, JavaScript, Images)
@@ -170,3 +171,16 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 PASSWORD_RESET_TIMEOUT = 900
+
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'JWT API',
+    'DESCRIPTION': 'JWT authentication',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

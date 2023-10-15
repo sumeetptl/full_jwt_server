@@ -9,7 +9,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
                                     write_only=True)
     class Meta:
         model=User
-        fields=["email", "name", "password", "password2", "tc"]
+        fields=["email", "name", "password", "password2"]
         extra_kwargs={
             'password':{'write_only':True}
         }
@@ -23,7 +23,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop("password2")
-        return User.objects.create(**validated_data)
+        user=User.objects.create_user(**validated_data)
+        return user
     
 class UserLoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=200)
