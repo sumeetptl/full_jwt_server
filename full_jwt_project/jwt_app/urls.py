@@ -1,6 +1,7 @@
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from jwt_app.views import UserRegisterationView, UserLoginView, UserProfileView, UserChangePassword, SendPasswordResetEmailView, ResetPasswordView
+from jwt_app.views import UserRegisterationView, UserLoginView, UserProfileView, UserChangePassword, \
+    SendPasswordResetEmailView, ResetPasswordView, VerifyEmail
 
 urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -11,6 +12,7 @@ urlpatterns = [
     path('profile/',UserProfileView.as_view(), name="Profile"),
     path('change_password/',UserChangePassword.as_view(), name="Change_Password"),
     path('reset_password_email/',SendPasswordResetEmailView.as_view(), name="Send_Email"),
-    path('reset_password/<str:uid>/<str:token>/',ResetPasswordView.as_view(), name="Reset Password")
-    
+    path('reset_password/<str:uid>/<str:token>/',ResetPasswordView.as_view(), name="reset-password"),
+    path('verify/', VerifyEmail.as_view(), name="email-verify"),
+
 ]

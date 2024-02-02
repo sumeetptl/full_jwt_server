@@ -63,11 +63,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
         email= attrs.get("email")
         try:
             user = User.objects.get(email=email)
-            uid = urlsafe_base64_encode(force_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            link = "http://localhost:3000/api/user/reset/"+ uid+ "/"+ token
-            print("Link : ",link)
-            return attrs
+            return user
         except User.DoesNotExist:
             raise serializers.ValidationError("User Not Registered")
         
@@ -107,4 +103,10 @@ class ResetPasswordSerializer(serializers.Serializer):
         # user.set_password(password)
         # user.save()
         # return attrs
-        
+
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=555)
+
+    class Meta:
+        model = User
+        fields = ['token']
